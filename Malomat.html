@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض بيانات المستخدم</title>
+</head>
+<body>
+    <h1>بيانات المستخدم</h1>
+    <script>
+        // رابط المستند في Firestore
+        const docUrl = "https://firestore.googleapis.com/v1/projects/shoplibya12/databases/(default)/documents/users/dOSXZrf9cV9lW5Hh8fV9t";
+
+        // جلب البيانات من Firestore باستخدام fetch
+        fetch(docUrl)
+            .then(response => response.json())  // تحويل البيانات إلى JSON
+            .then(data => {
+                // عرض البيانات في الكونسول
+                console.log("بيانات المستخدم: ", data.fields);
+
+                // عرض اسم المستخدم
+                const userName = data.fields.name.stringValue;
+                console.log("اسم المستخدم: " + userName);
+
+                // عرض رقم الواتساب
+                const userWhatsapp = data.fields.whatsapp.stringValue;
+                console.log("رقم الواتساب: " + userWhatsapp);
+
+                // عرض السيرة الذاتية
+                const userBio = data.fields.bio.stringValue;
+                console.log("السيرة الذاتية: " + userBio);
+
+                // عرض المدينة
+                const userCity = data.fields.city.stringValue;
+                console.log("المدينة: " + userCity);
+            })
+            .catch(error => {
+                // التعامل مع الأخطاء
+                console.error("حدث خطأ أثناء جلب البيانات: ", error);
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>واجهة المتجر</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #34495e); /* خلفية داكنة مع تدرج لوني هادئ */
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: rgba(0, 123, 255, 0.8); /* خلفية شفافة بلون أزرق */
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        header .search-bar {
+            display: flex;
+            align-items: center;
+        }
+
+        header input[type="text"] {
+            padding: 5px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 5px;
+        }
+
+        header button {
+            padding: 5px 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .post-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .post {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: calc(33% - 10px);
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .post img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .post h3 {
+            font-size: 16px;
+            margin: 10px 0 5px;
+        }
+
+        .post p {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .post button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-btn img {
+            width: 25px;
+            height: 25px;
+            margin-right: 5px;
+        }
+
+        .add-post-btn {
+            padding: 10px 20px;
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>واجهة المتجر</h1>
+        <div class="search-bar">
+            <input type="text" placeholder="بحث عن منشورات أو عميل (ID)" id="searchInput">
+            <button onclick="search()">بحث</button>
+        </div>
+        <div class="profile-btn">
+            <img src="profile-icon.png" alt="ملفي">
+            <button onclick="goToProfile()">ملفي</button>
+            <button class="add-post-btn" onclick="createPost()">إنشاء منشور</button>
+        </div>
+    </header>
+    <div class="content">
+        <div class="post-container" id="postsContainer">
+            <!-- المنشورات ستظهر هنا -->
+        </div>
+    </div>
+
+    <script>
+        let posts = [
+            { id: 1, title: "منتج 1", description: "د.ل 100", image: "product1.jpg", timestamp: new Date().toLocaleString() },
+            { id: 2, title: "منتج 2", description: "د.ل 200", image: "product2.jpg", timestamp: new Date().toLocaleString() },
+            { id: 3, title: "منتج 3", description: "د.ل 300", image: "product3.jpg", timestamp: new Date().toLocaleString() },
+        ];
+
+        // إضافة المنشورات إلى الصفحة
+        function loadPosts() {
+            const container = document.getElementById("postsContainer");
+            container.innerHTML = "";  // مسح المنشورات السابقة
+            posts.forEach(post => {
+                const postElement = document.createElement("div");
+                postElement.classList.add("post");
+                postElement.innerHTML = `
+                    <img src="${post.image}" alt="${post.title}">
+                    <h3>${post.title}</h3>
+                    <p>${post.description}</p>
+                    <div class="timestamp">نشر في: ${post.timestamp}</div>
+                    <button onclick="commentPost(${post.id})">تعليق</button>
+                `;
+                container.appendChild(postElement);
+            });
+        }
+
+        // إنشاء منشور جديد
+        function createPost() {
+            const title = prompt("عنوان المنشور:");
+            const description = prompt("وصف المنشور:");
+            const image = prompt("رابط صورة المنشور:");
+            if (title && description && image) {
+                const newPost = {
+                    id: posts.length + 1,
+                    title: title,
+                    description: description,
+                    image: image,
+                    timestamp: new Date().toLocaleString(),
+                };
+                posts.push(newPost);
+                loadPosts(); // إعادة تحميل المنشورات
+            }
+        }
+
+        // الانتقال إلى الملف الشخصي
+        function goToProfile() {
+            // تم إلغاء التحقق من حالة تسجيل الدخول
+            window.location.href = "profile.html"; // استبدال بالمسار الصحيح لصفحة الملف الشخصي
+        }
+
+        // فلترة التعليقات
+        function sanitizeComment(comment) {
+            const bannedWords = ["كلمة سيئة1", "كلمة سيئة2", "إهانة"];
+            let sanitized = comment.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            bannedWords.forEach(word => {
+                let regex = new RegExp(word, "gi");
+                sanitized = sanitized.replace(regex, "****");
+            });
+            return sanitized;
+        }
+
+        // إضافة تعليق على منشور
+        function commentPost(postId) {
+            const comment = prompt("اكتب تعليقك:");
+            if (comment && comment.trim() !== "") {
+                const sanitizedComment = sanitizeComment(comment);
+                const now = new Date();
+                alert(`تم نشر تعليقك على المنشور رقم ${postId}: ${sanitizedComment}\nوقت التعليق: ${now.toLocaleString()}`);
+            } else {
+                alert("التعليق فارغ. الرجاء إدخال تعليق.");
+            }
+        }
+
+        // البحث عن المنتجات أو العملاء
+        function search() {
+            const query = document.getElementById("searchInput").value.trim();
+            if (query) {
+                alert(`تم البحث عن: ${query}`);
+            } else {
+                alert("يرجى إدخال نص للبحث.");
+            }
+        }
+
+        // تعيين المنشورات عند تحميل الصفحة
+        window.onload = function () {
+            loadPosts(); // تحميل المنشورات عند تحميل الصفحة
+        };
+    </script>
+</body>
+</html>

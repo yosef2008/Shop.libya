@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px;
+        }
+        .message {
+            color: red;
+            margin: 10px 0;
+        }
+        .buttons {
+            margin: 20px;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 10px 0;
+            width: 80%;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .form {
+            display: none;
+            margin: 20px 0;
+        }
+        .form input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .form button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 80%;
+        }
+        .form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">تسجيل الدخول</div>
+    <p class="message">...لا تنسى حفظ معلوماتك فقد تحتاجها لاحقًا</p>
+    <div class="buttons">
+        <button class="button" onclick="showForm('register')">إنشاء حساب</button>
+        <button class="button" onclick="showForm('login')">تسجيل الدخول</button>
+    </div>
+    <div id="registerForm" class="form">
+        <h2>إنشاء حساب</h2>
+        <input type="text" placeholder="رقم الهاتف (يجب أن يبدأ بـ +2189)" id="registerPhone">
+        <input type="password" placeholder="كلمة السر (أكثر من 6 أحرف)" id="registerPassword">
+        <button onclick="register()">إنشاء حساب</button>
+    </div>
+    <div id="loginForm" class="form">
+        <h2>تسجيل الدخول</h2>
+        <input type="text" placeholder="رقم الهاتف" id="loginPhone">
+        <input type="password" placeholder="كلمة السر" id="loginPassword">
+        <button onclick="login()">تسجيل الدخول</button>
+    </div>
+
+    <script>
+        // دالة لإظهار النماذج (تسجيل أو تسجيل الدخول)
+        function showForm(formType) {
+            document.getElementById('registerForm').style.display = formType === 'register' ? 'block' : 'none';
+            document.getElementById('loginForm').style.display = formType === 'login' ? 'block' : 'none';
+        }
+
+        // دالة لإنشاء الحساب وتخزين البيانات في Local Storage
+        function register() {
+            const phone = document.getElementById('registerPhone').value;
+            const password = document.getElementById('registerPassword').value;
+
+            // التحقق من رقم الهاتف
+            if (!phone.startsWith('+2189') || phone.length !== 13) {
+                alert('الرجاء إدخال رقم هاتف صالح بصيغة +2189XXXXXXX.');
+                return;
+            }
+
+            // التحقق من كلمة المرور
+            if (password.length <= 6) {
+                alert('الرجاء إدخال كلمة سر مكونة من أكثر من 6 أحرف.');
+                return;
+            }
+
+            // حفظ البيانات في Local Storage
+            localStorage.setItem('userPhone', phone);
+            localStorage.setItem('userPassword', password);
+
+            alert('تم إنشاء الحساب بنجاح!');
+            showForm('login');
+        }
+
+        // دالة لتسجيل الدخول والتحقق من البيانات في Local Storage
+        function login() {
+            const phone = document.getElementById('loginPhone').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // استرجاع البيانات من Local Storage
+            const storedPhone = localStorage.getItem('userPhone');
+            const storedPassword = localStorage.getItem('userPassword');
+
+            // التحقق من البيانات
+            if (storedPhone === phone && storedPassword === password) {
+                alert('تم تسجيل الدخول بنجاح!');
+                window.location.href = 'store.html'; // الانتقال إلى صفحة المتجر
+            } else {
+                alert('رقم الهاتف أو كلمة المرور غير صحيحة.');
+            }
+        }
+    </script>
+</body>
+</html>

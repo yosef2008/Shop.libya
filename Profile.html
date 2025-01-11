@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي</title>
+    <style>
+        /* إعدادات عامه */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa; /* خلفية فاتحة */
+        }
+
+        .profile-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .input-field:focus {
+            border-color: #2575fc;
+            outline: none;
+        }
+
+        .save-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2575fc;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .save-button:hover {
+            background-color: #6a11cb;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* تنسيق الدائرة للصورة */
+        .profile-image {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-top: 20px;
+            cursor: pointer;
+            border: 2px solid #ccc;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ccc;
+            font-size: 30px;
+        }
+
+        /* تنسيق الثلاث نقاط */
+        .options-menu {
+            display: none;
+            position: absolute;
+            top: 120px;
+            right: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .options-menu button {
+            width: 100%;
+            padding: 5px;
+            margin: 5px 0;
+            border: none;
+            background-color: #f8f9fa;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .options-menu button:hover {
+            background-color: #ddd;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <h2>الملف الشخصي</h2>
+        
+        <!-- حقل الصورة -->
+        <div id="profileImageContainer" class="profile-image" onclick="toggleOptionsMenu()">
+            <span id="imageIcon">+</span>
+            <img id="profileImage" src="" alt="صورة الملف الشخصي" class="profile-image" style="display: none;">
+        </div>
+
+        <!-- قائمة الخيارات -->
+        <div id="optionsMenu" class="options-menu">
+            <button onclick="deleteImage()">حذف الصورة</button>
+            <button onclick="changeImage()">تغيير الصورة</button>
+            <button onclick="downloadImage()">تنزيل الصورة</button>
+        </div>
+
+        <input type="text" id="name" class="input-field" placeholder="أسمك الشخصي">
+        <input type="text" id="bio" class="input-field" placeholder="سيرتك الذاتية">
+        <input type="text" id="phone" class="input-field" placeholder="رقم هاتفك">
+        <input type="text" id="city" class="input-field" placeholder="مدينتك الحالية">
+        <button class="save-button" onclick="saveProfile()">حفظ</button>
+        <div class="footer">
+            <p>تم تحديث بياناتك بنجاح</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
+
+    <script>
+        // إعدادات Firebase
+        const firebaseConfig = {
+            apiKey: "API_KEY",
+            authDomain: "PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://PROJECT_ID.firebaseio.com",
+            projectId: "PROJECT_ID",
+            storageBucket: "PROJECT_ID.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+        const database = firebase.database();
+
+        // تحميل الصورة من Firebase
+        function loadProfileImage() {
+            const userId = "معرف_المستخدم";  // يجب تحديد معرف المستخدم
+            const userRef = database.ref('users/' + userId);
+
+            userRef.once('value').then(function(snapshot) {
+                const userData = snapshot.val();
+                if (userData && userData.profileImage) {
+                    document.getElementById('profileImage').src = userData.profileImage;
+                    document.getElementById('profileImage').style.display = 'block';
+                    document.getElementById('imageIcon').style.display = 'none'; // إخفاء الإشارة "+"
+                }
+            });
+        }
+
+        // إظهار قائمة الخيارات عند النقر على الصورة
+        function toggleOptionsMenu() {
+            const menu = document.getElementById('optionsMenu');
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // تغيير الصورة
+        function changeImage() {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.click();
+
+            fileInput.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const storageRef = storage.ref('profileImages/' + file.name);
+                    const uploadTask = storageRef.put(file);
+                    
+                    uploadTask.on('state_changed', function(snapshot) {
+                        // يمكن إضافة شريط تقدم هنا
+                    }, function(error) {
+                        console.error(error);  // التعامل مع الأخطاء
+                    }, function() {
+                        uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                            saveImageURLToDatabase(downloadURL);
+                        });
+                    });
+                }
+            };
+        }
+
+        // حذف الصورة
+        function deleteImage() {
+            const userId = "معرف_المستخدم";  // يجب تحديد معرف المستخدم
+            const userRef = database.ref('users/' + userId);
+
+            userRef.update({
+                profileImage: null
+            }).then(function() {
+                alert('تم حذف الصورة بنجاح!');
+                document.getElementById('profileImage').style.display = 'none';
+                document.getElementById('imageIcon').style.display = 'block';
+            }).catch(function(error) {
+                console.error("فشل في حذف الصورة:", error);
+            });
+        }
+
+        // تنزيل الصورة
+        function downloadImage() {
+            const imageUrl = document.getElementById('profileImage').src;
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = 'profile_image.jpg'; // يمكنك تغيير اسم الصورة هنا
+            link.click();
+        }
+
+        // تخزين رابط الصورة في قاعدة البيانات
+        function saveImageURLToDatabase(imageURL) {
+            const userId = "معرف_المستخدم";  // يجب تحديد معرف المستخدم
+            const userRef = database.ref('users/' + userId);
+
+            userRef.update({
+                profileImage: imageURL
+            }).then(function() {
+                alert("تم تحديث الصورة بنجاح!");
+                document.getElementById('profileImage').src = imageURL;
+                document.getElementById('profileImage').style.display = 'block';
+                document.getElementById('imageIcon').style.display = 'none';
