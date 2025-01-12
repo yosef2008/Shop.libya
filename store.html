@@ -7,13 +7,13 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #2c3e50, #34495e); /* خلفية داكنة مع تدرج لوني هادئ */
+            background: linear-gradient(135deg, #2c3e50, #34495e);
             margin: 0;
             padding: 0;
         }
 
         header {
-            background-color: rgba(0, 123, 255, 0.8); /* خلفية شفافة بلون أزرق */
+            background-color: rgba(0, 123, 255, 0.8);
             color: white;
             padding: 10px 20px;
             display: flex;
@@ -179,8 +179,7 @@
 
         // الانتقال إلى الملف الشخصي
         function goToProfile() {
-            // تم إلغاء التحقق من حالة تسجيل الدخول
-            window.location.href = "profile.html"; // استبدال بالمسار الصحيح لصفحة الملف الشخصي
+            window.location.href = "Profile.html"; // استبدال بالمسار الصحيح لصفحة الملف الشخصي
         }
 
         // فلترة التعليقات
@@ -199,8 +198,7 @@
             const comment = prompt("اكتب تعليقك:");
             if (comment && comment.trim() !== "") {
                 const sanitizedComment = sanitizeComment(comment);
-                const now = new Date();
-                alert(`تم نشر تعليقك على المنشور رقم ${postId}: ${sanitizedComment}\nوقت التعليق: ${now.toLocaleString()}`);
+                alert(`تم نشر تعليقك على المنشور رقم ${postId}: ${sanitizedComment}`);
             } else {
                 alert("التعليق فارغ. الرجاء إدخال تعليق.");
             }
